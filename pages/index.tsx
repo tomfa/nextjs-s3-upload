@@ -1,23 +1,36 @@
 import Head from "next/head";
 import { FileDrop } from "../components/FileDrop";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { File } from "../components/File";
 import FileList from "../components/FileList";
+import { uploadFile } from "../utils/api";
+import { FileDataDTO } from "../types";
 
 export default function Home() {
+  const [loadingFileNames, setLoadingFileNames] = useState<string[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<FileDataDTO[]>([]);
+
   const files = useMemo(
-    () => [
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-      { id: "isd", src: "/system-log.png", name: "cheese" },
-    ],
-    []
+    () =>
+      uploadedFiles.map((r) => ({
+        id: r.id,
+        src: r.url,
+        name: r.filename,
+      })),
+    [uploadedFiles]
   );
-  const onDrop = useCallback(async (files: File[]) => {
-    console.log("Dropped file " + String(files));
+
+  const onDrop = useCallback(async (toUpload: File[]) => {
+    await Promise.all(
+      toUpload.map(async (file) => {
+        setLoadingFileNames((names) => names.concat([file.name]));
+        const data = await uploadFile(file);
+        setLoadingFileNames((names) =>
+          names.filter((name) => name !== file.name)
+        );
+        setUploadedFiles((files) => files.concat([data]));
+      })
+    );
   }, []);
 
   return (
