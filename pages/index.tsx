@@ -1,8 +1,21 @@
 import Head from "next/head";
 import { FileDrop } from "../components/FileDrop";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { File } from "../components/File";
+import FileList from "../components/FileList";
 
 export default function Home() {
+  const files = useMemo(
+    () => [
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+      { id: "isd", src: "/system-log.png", name: "cheese" },
+    ],
+    []
+  );
   const onDrop = useCallback(async (files: File[]) => {
     console.log("Dropped file " + String(files));
   }, []);
@@ -18,12 +31,18 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="items-center justify-center w-full flex-1 px-20 text-center">
+      <main className="items-center justify-center w-full flex-1 px-20 mt-10 mb-10">
         <h1 className={"text-2xl"}>Upload file</h1>
         <p>File will be uploaded publicly</p>
 
-        <div className="flex items-center max-w-4xl mt-6 sm:w-full m-auto">
-          <FileDrop onDrop={onDrop} className={"w-full "} />
+        <div className="flex items-center mt-6 sm:w-full mb-10">
+          <FileDrop onDrop={onDrop} className={"w-full"} />
+        </div>
+
+        <h1 className={"text-2xl"}>Uploaded files</h1>
+
+        <div className="mt-3 mb-3 border-2">
+          <FileList files={files} />
         </div>
       </main>
 
