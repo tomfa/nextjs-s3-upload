@@ -46,7 +46,6 @@ export default function Home() {
 
       <main className="items-center justify-center w-full flex-1 px-20 mt-10 mb-10">
         <h1 className={"text-2xl"}>Upload file</h1>
-        <p>File will be uploaded publicly</p>
 
         <div className="flex items-center mt-6 sm:w-full mb-10">
           <FileDrop onDrop={onDrop} className={"w-full"} />

@@ -2,6 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   ListObjectsCommand,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { fromEnv } from "@aws-sdk/credential-providers";
@@ -29,7 +30,19 @@ export const listFiles = async ({
       `Unexpected status code when listing ${config.s3.bucketName}/${owner}: ${status}`
     );
   }
-  return mapGetFilesResponse(response);
+  const filesWithoutSignedUrl = mapGetFilesResponse(response);
+
+  return Promise.all(
+    filesWithoutSignedUrl.map(async (file) => {
+      const url = await getDownloadUrl({
+        key: file.id,
+      });
+      return {
+        ...file,
+        url,
+      };
+    })
+  );
 };
 
 type GetUploadUrlProps = {
@@ -52,4 +65,19 @@ export const getUploadUrl = async ({
   });
   const signedUrl = await getSignedUrl(s3, command, { expiresIn });
   return { signedUrl, key };
+};
+
+type GetSignedUrlProps = {
+  key: string;
+  options?: { expiresIn?: number };
+};
+export const getDownloadUrl = async ({
+  key,
+  options: { expiresIn = 15 * 60 } = {},
+}: GetSignedUrlProps): Promise<string> => {
+  const command = new GetObjectCommand({
+    Bucket: config.s3.bucketName,
+    Key: key,
+  });
+  return getSignedUrl(s3, command, { expiresIn });
 };

@@ -1,8 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getUploadUrl } from "../../storage/fileStorage";
+import { getDownloadUrl, getUploadUrl } from "../../storage/fileStorage";
 import { APIFileResponse, FileDataDTO } from "../../types";
-import { getAbsoluteUrlFromKey } from "../../utils/files";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,12 +15,13 @@ export default async function handler(
     });
   }
   const { signedUrl, key } = await getUploadUrl({
-    acl: "public-read",
+    acl: "private",
     filename,
     owner: "default",
   });
+  const url = await getDownloadUrl({ key });
   const file: FileDataDTO = {
-    url: getAbsoluteUrlFromKey(key),
+    url,
     filename,
     modified: new Date().toISOString(),
     id: key,
