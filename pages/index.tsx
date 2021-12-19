@@ -3,21 +3,21 @@ import { FileDrop } from "../components/FileDrop";
 import { useCallback, useMemo, useState } from "react";
 import { File } from "../components/File";
 import FileList from "../components/FileList";
-import { uploadFile } from "../utils/api";
+import { uploadFile, useFiles } from "../utils/api";
 import { FileDataDTO } from "../types";
 
 export default function Home() {
+  const { data: existingFiles, loading, error } = useFiles();
   const [loadingFileNames, setLoadingFileNames] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileDataDTO[]>([]);
 
   const files = useMemo(
-    () =>
-      uploadedFiles.map((r) => ({
-        id: r.id,
-        src: r.url,
-        name: r.filename,
-      })),
-    [uploadedFiles]
+    () => {
+      const existingFileIds = existingFiles.map(f => f.id);
+      const nonDuplicateUploadedFiles = uploadedFiles.filter(f => !existingFileIds.includes(f.id))
+      return nonDuplicateUploadedFiles.reverse().concat(existingFiles)
+    },
+    [uploadedFiles, existingFiles]
   );
 
   const onDrop = useCallback(async (toUpload: File[]) => {

@@ -1,4 +1,23 @@
-import { APIFileResponse, FileDataDTO } from "../types";
+import useSWR from 'swr'
+import {APIFileResponse, APIListFileResponse, FileDataDTO} from "../types";
+
+const fetcher = (info: RequestInfo, init?: RequestInit) => fetch(info, init).then(res => res.json())
+
+interface SWRResponse<T> {
+  error: any,
+  data: T,
+  loading: boolean
+}
+
+export const useFiles = (
+): SWRResponse<FileDataDTO[]> => {
+  const { data, error } = useSWR<APIListFileResponse>(`/api/list_files`, fetcher)
+  return {
+    data: data?.data?.files || [],
+    error,
+    loading: !data && !error
+  }
+};
 
 export const uploadFile = async (
   file: File

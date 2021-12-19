@@ -16,7 +16,8 @@
     "prettier": "^2.5.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-dropzone": "^11.4.2"
+    "react-dropzone": "^11.4.2",
+    "swr": "^1.1.2-beta.0"
   },
   "devDependencies": {
     "@types/node": "17.0.0",
