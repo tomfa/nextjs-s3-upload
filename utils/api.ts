@@ -1,11 +1,11 @@
-import { APIResponse, FileDataDTO } from "../types";
+import { APIFileResponse, FileDataDTO } from "../types";
 
 export const uploadFile = async (
   file: File
 ): Promise<FileDataDTO> => {
   const fileName = file.name;
   const response = await fetch(`/api/s3_upload_url?filename=${fileName}`);
-  const { data, error }: APIResponse = await response.json();
+  const { data, error }: APIFileResponse = await response.json();
   if (error || !data) {
     throw new Error(error || 'Unexpected response');
   }

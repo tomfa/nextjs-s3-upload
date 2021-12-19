@@ -1,12 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getUploadUrl } from "../../storage/fileStorage";
-import { APIResponse, FileDataDTO } from "../../types";
+import { APIFileResponse, FileDataDTO } from "../../types";
 import { getAbsoluteUrlFromKey } from "../../utils/files";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIResponse>
+  res: NextApiResponse<APIFileResponse>
 ) {
   const filename = String(req.query.filename);
   if (!filename) {

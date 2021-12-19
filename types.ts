@@ -5,8 +5,17 @@ export type FileDataDTO = {
   id: string;
 };
 
-export type APIResponse = {
+export type APIFileResponse = {
   message: string;
   error?: string;
-  data?: { uploadUrl: string; file: FileDataDTO };
+  data?: { signedUrl: string; file: FileDataDTO };
 }
+
+export type APIListFileResponse = {
+  message: string;
+  error?: string;
+  data?: { files: FileDataDTO[] };
+}
+
+
+export type ACL = 'public-read' | 'private'
