@@ -3,11 +3,11 @@ import { FileDrop } from "../components/FileDrop";
 import { useCallback, useMemo, useState } from "react";
 import { File } from "../components/File";
 import FileList from "../components/FileList";
-import { uploadFile, useFiles } from "../utils/api";
+import {deleteFile, uploadFile, useFiles} from "../utils/api";
 import { FileDataDTO } from "../types";
 
 export default function Home() {
-  const { data: existingFiles, loading, error } = useFiles();
+  const { data: existingFiles, loading, error, mutate } = useFiles();
   const [loadingFileNames, setLoadingFileNames] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileDataDTO[]>([]);
 
@@ -19,6 +19,12 @@ export default function Home() {
     },
     [uploadedFiles, existingFiles]
   );
+
+  const onDeleteFile = useCallback(async (file: FileDataDTO) => {
+    deleteFile(file)
+    setUploadedFiles((existing) => existing.filter(e => e.id !== file.id))
+    mutate(existingFiles.filter(e => e.id !== file.id))
+  }, [existingFiles, mutate])
 
   const onDrop = useCallback(async (toUpload: File[]) => {
     await Promise.all(
@@ -54,7 +60,7 @@ export default function Home() {
         <h1 className={"text-2xl"}>Uploaded files</h1>
 
         <div className="mt-3 mb-3 border-2">
-          <FileList files={files} />
+          <FileList files={files} onDelete={onDeleteFile} />
         </div>
       </main>
 

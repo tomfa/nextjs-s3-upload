@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   ListObjectsCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { fromEnv } from "@aws-sdk/credential-providers";
@@ -12,6 +13,28 @@ import { FileDataDTO } from "../types";
 
 const credentials = fromEnv(); // reads env vars AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY
 const s3 = new S3Client({ region: config.s3.region, credentials });
+
+export const deleteFile = async ({
+  owner,
+  filename,
+}: {
+  owner: string;
+  filename: string;
+}): Promise<{ success: boolean, error?: string }> => {
+  const key = `${owner}/${filename}`;
+  const response = await s3.send(
+    new DeleteObjectCommand({
+      Bucket: config.s3.bucketName,
+      Key: key,
+    })
+  );
+  const status = response.$metadata.httpStatusCode;
+  if (status && status >= 300) {
+    console.log(response)
+    return { success: false, error: `Unexpected status code when delete ${config.s3.bucketName}/${key}: ${status}` }
+  }
+  return { success: true }
+};
 
 export const listFiles = async ({
   owner,
@@ -25,7 +48,7 @@ export const listFiles = async ({
     })
   );
   const status = response.$metadata.httpStatusCode;
-  if (status !== 200) {
+  if (status && status >= 300) {
     throw new Error(
       `Unexpected status code when listing ${config.s3.bucketName}/${owner}: ${status}`
     );

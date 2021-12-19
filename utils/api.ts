@@ -1,35 +1,47 @@
-import useSWR from 'swr'
-import {APIFileResponse, APIListFileResponse, FileDataDTO} from "../types";
+import useSWR, { KeyedMutator, useSWRConfig } from "swr";
+import { APIFileResponse, APIListFileResponse, FileDataDTO } from "../types";
 
-const fetcher = (info: RequestInfo, init?: RequestInit) => fetch(info, init).then(res => res.json())
+const fetcher = (info: RequestInfo, init?: RequestInit) =>
+  fetch(info, init).then((res) => res.json());
 
 interface SWRResponse<T> {
-  error: any,
-  data: T,
-  loading: boolean
+  error: any;
+  data: T;
+  loading: boolean;
+  mutate: (data: T) => void;
 }
 
-export const useFiles = (
-): SWRResponse<FileDataDTO[]> => {
-  const { data, error } = useSWR<APIListFileResponse>(`/api/list_files`, fetcher)
+export const useFiles = (): SWRResponse<FileDataDTO[]> => {
+  const { data, error, mutate } = useSWR<APIListFileResponse>(
+    `/api/list_files`,
+    fetcher
+  );
   return {
     data: data?.data?.files || [],
     error,
-    loading: !data && !error
-  }
+    loading: !data && !error,
+    mutate: (files) => mutate({ data: { files }, message: "OK" }, false),
+  };
 };
 
-export const uploadFile = async (
-  file: File
-): Promise<FileDataDTO> => {
+export const deleteFile = async (file: FileDataDTO): Promise<FileDataDTO> => {
+  const response = await fetch(`/api/delete_file?filename=${file.filename}`, { method: 'DELETE'});
+  const { error }: APIFileResponse = await response.json();
+  if (error) {
+    throw new Error(error || "Unexpected response");
+  }
+  return file;
+};
+
+export const uploadFile = async (file: File): Promise<FileDataDTO> => {
   const fileName = file.name;
   const response = await fetch(`/api/s3_upload_url?filename=${fileName}`);
   const { data, error }: APIFileResponse = await response.json();
   if (error || !data) {
-    throw new Error(error || 'Unexpected response');
+    throw new Error(error || "Unexpected response");
   }
   await performS3Upload({ file, url: data.signedUrl });
-  return data.file
+  return data.file;
 };
 
 const performS3Upload = ({ file, url }: { file: File; url: string }) =>
