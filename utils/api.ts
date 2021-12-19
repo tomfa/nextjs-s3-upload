@@ -13,7 +13,7 @@ interface SWRResponse<T> {
 
 export const useFiles = (): SWRResponse<FileDataDTO[]> => {
   const { data, error, mutate } = useSWR<APIListFileResponse>(
-    `/api/list_files`,
+    `/api/files`,
     fetcher
   );
   return {
@@ -25,7 +25,9 @@ export const useFiles = (): SWRResponse<FileDataDTO[]> => {
 };
 
 export const deleteFile = async (file: FileDataDTO): Promise<FileDataDTO> => {
-  const response = await fetch(`/api/delete_file?filename=${file.filename}`, { method: 'DELETE'});
+  const response = await fetch(`/api/files/${file.filename}`, {
+    method: "DELETE",
+  });
   const { error }: APIFileResponse = await response.json();
   if (error) {
     throw new Error(error || "Unexpected response");
@@ -35,7 +37,9 @@ export const deleteFile = async (file: FileDataDTO): Promise<FileDataDTO> => {
 
 export const uploadFile = async (file: File): Promise<FileDataDTO> => {
   const fileName = file.name;
-  const response = await fetch(`/api/s3_upload_url?filename=${fileName}`);
+  const response = await fetch(`/api/files/?filename=${fileName}`, {
+    method: "PUT",
+  });
   const { data, error }: APIFileResponse = await response.json();
   if (error || !data) {
     throw new Error(error || "Unexpected response");

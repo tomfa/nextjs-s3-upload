@@ -3,7 +3,7 @@ import { FileDrop } from "../components/FileDrop";
 import { useCallback, useMemo, useState } from "react";
 import { File } from "../components/File";
 import FileList from "../components/FileList";
-import {deleteFile, uploadFile, useFiles} from "../utils/api";
+import { deleteFile, uploadFile, useFiles } from "../utils/api";
 import { FileDataDTO } from "../types";
 
 export default function Home() {
@@ -11,20 +11,22 @@ export default function Home() {
   const [loadingFileNames, setLoadingFileNames] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileDataDTO[]>([]);
 
-  const files = useMemo(
-    () => {
-      const existingFileIds = existingFiles.map(f => f.id);
-      const nonDuplicateUploadedFiles = uploadedFiles.filter(f => !existingFileIds.includes(f.id))
-      return nonDuplicateUploadedFiles.reverse().concat(existingFiles)
-    },
-    [uploadedFiles, existingFiles]
-  );
+  const files = useMemo(() => {
+    const existingFileIds = existingFiles.map((f) => f.id);
+    const nonDuplicateUploadedFiles = uploadedFiles.filter(
+      (f) => !existingFileIds.includes(f.id)
+    );
+    return nonDuplicateUploadedFiles.reverse().concat(existingFiles);
+  }, [uploadedFiles, existingFiles]);
 
-  const onDeleteFile = useCallback(async (file: FileDataDTO) => {
-    deleteFile(file)
-    setUploadedFiles((existing) => existing.filter(e => e.id !== file.id))
-    mutate(existingFiles.filter(e => e.id !== file.id))
-  }, [existingFiles, mutate])
+  const onDeleteFile = useCallback(
+    async (file: FileDataDTO) => {
+      deleteFile(file);
+      setUploadedFiles((existing) => existing.filter((e) => e.id !== file.id));
+      mutate(existingFiles.filter((e) => e.id !== file.id));
+    },
+    [existingFiles, mutate]
+  );
 
   const onDrop = useCallback(async (toUpload: File[]) => {
     await Promise.all(

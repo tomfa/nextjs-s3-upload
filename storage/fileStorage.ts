@@ -15,13 +15,13 @@ const credentials = fromEnv(); // reads env vars AWS_ACCESS_KEY_ID + AWS_SECRET_
 const s3 = new S3Client({ region: config.s3.region, credentials });
 
 export const deleteFile = async ({
-  owner,
+  folder,
   filename,
 }: {
-  owner: string;
+  folder: string;
   filename: string;
 }): Promise<{ success: boolean, error?: string }> => {
-  const key = `${owner}/${filename}`;
+  const key = `${folder}/${filename}`;
   const response = await s3.send(
     new DeleteObjectCommand({
       Bucket: config.s3.bucketName,
@@ -37,20 +37,20 @@ export const deleteFile = async ({
 };
 
 export const listFiles = async ({
-  owner,
+  folder,
 }: {
-  owner: string;
+  folder: string;
 }): Promise<FileDataDTO[]> => {
   const response = await s3.send(
     new ListObjectsCommand({
       Bucket: config.s3.bucketName,
-      Prefix: `${owner}/`,
+      Prefix: `${folder}/`,
     })
   );
   const status = response.$metadata.httpStatusCode;
   if (status && status >= 300) {
     throw new Error(
-      `Unexpected status code when listing ${config.s3.bucketName}/${owner}: ${status}`
+      `Unexpected status code when listing ${config.s3.bucketName}/${folder}: ${status}`
     );
   }
   const filesWithoutSignedUrl = mapGetFilesResponse(response);
@@ -69,18 +69,18 @@ export const listFiles = async ({
 };
 
 type GetUploadUrlProps = {
-  owner: string;
+  folder: string;
   filename: string;
   acl?: "public-read" | "private";
   options?: { expiresIn?: number };
 };
 export const getUploadUrl = async ({
-  owner,
+  folder,
   filename,
   acl = "public-read",
   options: { expiresIn = 15 * 60 } = {},
 }: GetUploadUrlProps): Promise<{ signedUrl: string; key: string }> => {
-  const key = `${owner}/${filename}`;
+  const key = `${folder}/${filename}`;
   const command = new PutObjectCommand({
     Bucket: config.s3.bucketName,
     Key: key,
