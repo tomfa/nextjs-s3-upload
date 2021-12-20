@@ -52,7 +52,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="items-center justify-center w-full flex-1 px-20 mt-10 mb-10">
+      <main className="items-center justify-center w-full flex-1 px-5 md:px-10 mt-10 mb-10">
         <h1 className={"text-2xl"}>Upload file</h1>
 
         <div className="flex items-center mt-6 sm:w-full mb-10">
