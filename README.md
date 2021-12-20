@@ -1,34 +1,61 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# File uploading to AWS S3 buckets from a [Next.js](https://nextjs.org/) project.
 
-## Getting Started
+This repo shows file upload, list, display and delete of private files in S3, from Next.js.  
 
-First, run the development server:
+_Demo: [https://nextjs-s3-upload.vercel.app](https://nextjs-s3-upload.vercel.app)_
+
+## Setup
+
+_You'll need an S3 bucket and AWS credentials to run the
+app. See section at bottom if you haven't got this already_.
+
+### Set up env
+Copy .env.example files to .env.local
+```
+cp .env.example .env.local
+```
+
+Replace with your aws region, bucket name and keys
+```
+AWS_BUCKET_REGION=eu-north-1
+S3_BUCKET_NAME=my.bucket.name
+AWS_ACCESS_KEY_ID=AKIAMyAWSAccessId......
+AWS_SECRET_ACCESS_KEY=XMyAWSSecret.......
+```
+
+### Install and run
 
 ```bash
-npm run dev
-# or
+yarn
 yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Add S3 bucket and IAM user
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+You'll need an S3 bucket and AWS credentials to run the
+app.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+#### Manually
 
-## Learn More
+- Navigate to [AWS console](https://s3.console.aws.amazon.com/) and create a regular S3 bucket.
+- Preferably, create a new IAM user and download its keys.
 
-To learn more about Next.js, take a look at the following resources:
+#### With terraform
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Terraform files are added to the **infrastructure** folder. This will prompt for bucket name, and then create a bucket and an IAM user with necessary permissions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
+# Install terraform
+brew install hashicorp/tap/terraform
 
-## Deploy on Vercel
+# Navigate to terraform files
+cd infrastructure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Download modules
+terraform init
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+# Create stuff. Will prompt for info and confirmation
+terraform apply
+```
