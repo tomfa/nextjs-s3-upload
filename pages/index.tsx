@@ -7,7 +7,7 @@ import { deleteFile, uploadFile, useFiles } from "../utils/api";
 import { FileDataDTO } from "../types";
 
 export default function Home() {
-  const { data: existingFiles, loading, error, mutate } = useFiles();
+  const { data: existingFiles, loading, mutate } = useFiles();
   const [loadingFileNames, setLoadingFileNames] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileDataDTO[]>([]);
 
@@ -62,7 +62,7 @@ export default function Home() {
         <h1 className={"text-2xl"}>Uploaded files</h1>
 
         <div className="mt-3 mb-3 border-2">
-          <FileList files={files} onDelete={onDeleteFile} />
+          <FileList files={files} onDelete={onDeleteFile} loading={loading} />
         </div>
       </main>
 
