@@ -31,7 +31,7 @@ export default function Home() {
   const onDrop = useCallback(async (toUpload: File[]) => {
     await Promise.all(
       toUpload.map(async (file) => {
-        setLoadingFileNames((names) => names.concat([file.name]));
+        setLoadingFileNames((names) => [file.name].concat(names));
         const data = await uploadFile(file);
         setLoadingFileNames((names) =>
           names.filter((name) => name !== file.name)
@@ -62,7 +62,7 @@ export default function Home() {
         <h1 className={"text-2xl"}>Uploaded files</h1>
 
         <div className="mt-3 mb-3 border-2">
-          <FileList files={files} onDelete={onDeleteFile} loading={loading} />
+          <FileList files={files} onDelete={onDeleteFile} loading={loading} loadingFileNames={loadingFileNames} />
         </div>
       </main>
 

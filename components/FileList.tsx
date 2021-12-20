@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 type Props = {
   files: FileDataDTO[];
+  loadingFileNames: string[];
   loading: boolean;
   onDelete: (file: FileDataDTO) => void;
 };
@@ -12,7 +13,12 @@ const dummyFile: FileDataDTO = {
   url: "",
   id: "",
 };
-export default function FileList({ files, onDelete, loading }: Props) {
+export default function FileList({
+  files,
+  onDelete,
+  loading,
+  loadingFileNames,
+}: Props) {
   return (
     <div className="bg-white">
       <div className="py-16 px-4 sm:py-6 sm:px-6 lg:px-8">
@@ -21,6 +27,10 @@ export default function FileList({ files, onDelete, loading }: Props) {
         </h2>
 
         <div className={"masonry-wrapper"}>
+          {loadingFileNames &&
+            loadingFileNames.map((filename) => (
+              <FileComponent key={filename} file={{ ...dummyFile, filename, modified: 'Just now' }} loading />
+            ))}
           {loading && (
             <>
               <FileComponent file={dummyFile} loading />
@@ -81,8 +91,7 @@ const FileComponent = ({
         </h3>
         <div className={"flex w-full justify-between"}>
           <span className={"text-gray-500 text-xs block"}>
-            {file.modified &&
-              new Date(file.modified).toISOString().substr(0, 10)}
+            {formatDateString(file.modified)}
           </span>
           {onDelete && (
             <button
@@ -97,3 +106,14 @@ const FileComponent = ({
     </div>
   );
 };
+
+const formatDateString = (dateString: string) => {
+  if (!dateString) {
+    return ''
+  }
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return dateString
+  }
+  return date.toISOString().substring(0, 10)
+}
