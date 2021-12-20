@@ -17,10 +17,10 @@ cp .env.example .env.local
 
 Replace with your aws region, bucket name and keys
 ```
-AWS_BUCKET_REGION=eu-north-1
+S3_BUCKET_REGION=eu-north-1
 S3_BUCKET_NAME=my.bucket.name
-AWS_ACCESS_KEY_ID=AKIAMyAWSAccessId......
-AWS_SECRET_ACCESS_KEY=XMyAWSSecret.......
+SECRET_AWS_ACCESS_KEY_ID=AKIAMyAWSAccessId......
+SECRET_AWS_SECRET_ACCESS_KEY=XMyAWSSecret.......
 ```
 
 ### Install and run
